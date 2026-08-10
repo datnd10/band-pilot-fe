@@ -1,0 +1,25 @@
+import { type RouteConfig, index, route } from "@react-router/dev/routes";
+
+export default [
+  index("routes/home.tsx"),
+  route("/login", "routes/login.tsx"),
+
+  // Dictionary — tra cứu tất cả từ
+  route("/vocabulary", "routes/vocabulary/list.tsx"),
+  route("/vocabulary/add", "routes/vocabulary/add.tsx"),
+  route("/vocabulary/:id/edit", "routes/vocabulary/edit.tsx"),
+  route("/vocabulary/:id", "routes/vocabulary/detail.tsx"),
+
+  // Study Sets (Groups)
+  route("/groups", "routes/groups/list.tsx"),
+  route("/groups/:id", "routes/groups/detail.tsx"),
+
+  // Study modes — scoped to a group
+  route("/groups/:id/flashcard", "routes/groups/flashcard.tsx"),
+  route("/groups/:id/flashcard/summary", "routes/groups/flashcard-summary.tsx"),
+  route("/groups/:id/typing", "routes/groups/typing.tsx"),
+  route("/groups/:id/typing/summary", "routes/groups/typing-summary.tsx"),
+
+  // Bulk import
+  route("/import", "routes/import.tsx"),
+] satisfies RouteConfig;
