@@ -265,6 +265,48 @@ export default function WordDetail() {
             </div>
           )}
         </section>
+
+        {/* Divider */}
+        <hr className="mt-5 mb-5 border-gray-100" />
+
+        {/* Review Schedule — Requirements 7.1, 7.2 */}
+        <section aria-labelledby="review-schedule-heading">
+          <h2
+            id="review-schedule-heading"
+            className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-400"
+          >
+            Review Schedule
+          </h2>
+
+          {word.nextReviewDate != null ? (
+            <dl className="grid grid-cols-3 gap-3">
+              <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                <dt className="text-xs font-medium text-gray-400">Next Review</dt>
+                <dd className="mt-1 text-sm font-semibold text-gray-800">
+                  {new Date(word.nextReviewDate + 'T00:00:00').toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </dd>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                <dt className="text-xs font-medium text-gray-400">Interval</dt>
+                <dd className="mt-1 text-sm font-semibold text-gray-800">
+                  {word.interval} day{word.interval !== 1 ? 's' : ''}
+                </dd>
+              </div>
+              <div className="rounded-lg border border-gray-100 bg-gray-50 px-4 py-3">
+                <dt className="text-xs font-medium text-gray-400">Repetitions</dt>
+                <dd className="mt-1 text-sm font-semibold text-gray-800">{word.repetitions}</dd>
+              </div>
+            </dl>
+          ) : (
+            <p className="text-sm text-gray-400 italic" aria-label="No review schedule">
+              Not scheduled
+            </p>
+          )}
+        </section>
       </article>
 
       {/* Action row */}

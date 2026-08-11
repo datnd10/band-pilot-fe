@@ -1,8 +1,11 @@
 import type {
   ApiError,
+  DueWordResponse,
   GroupRequest,
   GroupResponse,
   ImportResponse,
+  ReviewRequest,
+  ReviewResponse,
   ReviewSessionRequest,
   TypingSessionRequest,
   WordRequest,
@@ -288,4 +291,23 @@ export function importCsv(file: File, groupId?: string): Promise<ImportResponse>
     method: 'POST',
     body: formData,
   })
+}
+
+// ---------------------------------------------------------------------------
+// SRS (Spaced Repetition System)
+// ---------------------------------------------------------------------------
+
+export function getSrsDueWords(): Promise<DueWordResponse[]> {
+  return apiFetch<DueWordResponse[]>('/srs/due')
+}
+
+export function submitSrsReview(data: ReviewRequest): Promise<ReviewResponse> {
+  return apiFetch<ReviewResponse>('/srs/review', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export function getSrsDueCount(): Promise<{ count: number }> {
+  return apiFetch<{ count: number }>('/srs/due-count')
 }

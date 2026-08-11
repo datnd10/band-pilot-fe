@@ -13,7 +13,7 @@ import {
 
 import type { Route } from './+types/root'
 import { ToastContext, useToastState } from '~/hooks/useToast'
-import { getToken, clearToken } from '~/api/client'
+import { getToken, clearToken, getSrsDueCount } from '~/api/client'
 import './app.css'
 
 // ---------------------------------------------------------------------------
@@ -83,7 +83,15 @@ function ToastList() {
 
 function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [dueCount, setDueCount] = useState(0)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  useEffect(() => {
+    getSrsDueCount()
+      .then(({ count }) => setDueCount(count))
+      .catch(() => setDueCount(0))
+  }, [location.pathname])
 
   function handleLogout() {
     clearToken()
@@ -134,6 +142,13 @@ function TopNav() {
                 {item.label}
               </NavLink>
             ))}
+            <NavLink
+              to="/review"
+              className={navLinkClass}
+              role="menuitem"
+            >
+              Review ({dueCount})
+            </NavLink>
             <button
               type="button"
               onClick={handleLogout}
@@ -198,6 +213,14 @@ function TopNav() {
                 {item.label}
               </NavLink>
             ))}
+            <NavLink
+              to="/review"
+              className={mobileNavLinkClass}
+              role="menuitem"
+              onClick={() => setMenuOpen(false)}
+            >
+              Review ({dueCount})
+            </NavLink>
           </div>
         </div>
       )}

@@ -33,6 +33,10 @@ export interface WordResponse {
   status: WordStatus
   createdAt: string
   updatedAt: string
+  // SRS fields (null when no SRS record exists for this word)
+  nextReviewDate?: string | null
+  interval?: number | null
+  repetitions?: number | null
 }
 
 // Group types
@@ -84,4 +88,29 @@ export interface ApiError {
   error: string
   message: string
   timestamp: string
+}
+
+// SRS types
+export type SrsRating = 'AGAIN' | 'GOOD' | 'EASY'
+
+export interface DueWordResponse {
+  wordId: string
+  word: string
+  meaning: string
+  phonetic?: string
+  type?: string
+  example?: string
+}
+
+export interface ReviewRequest {
+  wordId: string
+  rating: SrsRating
+}
+
+export interface ReviewResponse {
+  wordId: string
+  nextReviewDate: string
+  interval: number
+  easeFactor: number
+  repetitions: number
 }
