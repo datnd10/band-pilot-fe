@@ -100,6 +100,14 @@ export interface DueWordResponse {
   phonetic?: string
   type?: string
   example?: string
+  examples?: string[]
+}
+
+export interface ProgressResponse {
+  totalWords: number
+  dueToday: number
+  learnedWords: number
+  matureWords: number
 }
 
 export interface ReviewRequest {

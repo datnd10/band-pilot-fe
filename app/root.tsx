@@ -40,6 +40,7 @@ export const links: Route.LinksFunction = () => [
 const NAV_ITEMS = [
   { label: 'Dictionary', to: '/vocabulary' },
   { label: 'Study Sets', to: '/groups' },
+  { label: 'Dashboard', to: '/dashboard' },
 ] as const
 
 // ---------------------------------------------------------------------------

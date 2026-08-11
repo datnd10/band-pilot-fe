@@ -23,6 +23,9 @@ export default [
   // Bulk import
   route("/import", "routes/import.tsx"),
 
+  // Dashboard
+  route("/dashboard", "routes/dashboard.tsx"),
+
   // Daily Review (SRS)
   route("/review", "routes/review.tsx"),
 ] satisfies RouteConfig;

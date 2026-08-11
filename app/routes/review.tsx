@@ -196,6 +196,7 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
         flipped={flipped}
         onFlipRequest={flipCard}
         onRate={handleRate}
+        examples={currentWord.examples}
       />
 
       {/* Keyboard hints */}

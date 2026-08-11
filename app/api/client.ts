@@ -4,6 +4,7 @@ import type {
   GroupRequest,
   GroupResponse,
   ImportResponse,
+  ProgressResponse,
   ReviewRequest,
   ReviewResponse,
   ReviewSessionRequest,
@@ -310,4 +311,8 @@ export function submitSrsReview(data: ReviewRequest): Promise<ReviewResponse> {
 
 export function getSrsDueCount(): Promise<{ count: number }> {
   return apiFetch<{ count: number }>('/srs/due-count')
+}
+
+export function getSrsProgress(): Promise<ProgressResponse> {
+  return apiFetch<ProgressResponse>('/srs/progress')
 }
