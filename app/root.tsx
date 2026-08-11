@@ -13,7 +13,8 @@ import {
 
 import type { Route } from './+types/root'
 import { ToastContext, useToastState } from '~/hooks/useToast'
-import { getToken, clearToken, getSrsDueCount } from '~/api/client'
+import { getToken, clearToken, getSrsDueCount, getStreak } from '~/api/client'
+import { useNotificationReminder } from '~/hooks/useNotificationReminder'
 import './app.css'
 
 // ---------------------------------------------------------------------------
@@ -41,6 +42,8 @@ const NAV_ITEMS = [
   { label: 'Dictionary', to: '/vocabulary' },
   { label: 'Study Sets', to: '/groups' },
   { label: 'Dashboard', to: '/dashboard' },
+  { label: 'History', to: '/session-history' },
+  { label: 'Smart Import', to: '/smart-import' },
 ] as const
 
 // ---------------------------------------------------------------------------
@@ -85,6 +88,7 @@ function ToastList() {
 function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [dueCount, setDueCount] = useState(0)
+  const [currentStreak, setCurrentStreak] = useState(0)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -92,6 +96,12 @@ function TopNav() {
     getSrsDueCount()
       .then(({ count }) => setDueCount(count))
       .catch(() => setDueCount(0))
+  }, [location.pathname])
+
+  useEffect(() => {
+    getStreak()
+      .then(s => setCurrentStreak(s.currentStreak))
+      .catch(() => setCurrentStreak(0))
   }, [location.pathname])
 
   function handleLogout() {
@@ -150,6 +160,12 @@ function TopNav() {
             >
               Review ({dueCount})
             </NavLink>
+            <span
+              className="px-3 py-2 text-sm font-medium text-orange-600"
+              aria-label={`Streak: ${currentStreak} ngày`}
+            >
+              🔥 {currentStreak}
+            </span>
             <button
               type="button"
               onClick={handleLogout}
@@ -222,6 +238,12 @@ function TopNav() {
             >
               Review ({dueCount})
             </NavLink>
+            <span
+              className="block rounded-md px-3 py-2 text-base font-medium text-orange-600"
+              aria-label={`Streak: ${currentStreak} ngày`}
+            >
+              🔥 {currentStreak}
+            </span>
           </div>
         </div>
       )}
@@ -257,6 +279,9 @@ export default function App() {
       navigate('/login', { replace: true })
     }
   }, [location.pathname, navigate, isLoginPage])
+
+  // Browser notification reminder (no-op when not logged in or on login page)
+  useNotificationReminder(!isLoginPage && !!getToken())
 
   // Login page renders without nav/shell
   if (isLoginPage) {

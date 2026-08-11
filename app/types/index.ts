@@ -82,6 +82,37 @@ export interface TypingSessionRequest {
   results: TypingSessionWordResult[]
 }
 
+// Session History types
+export type SessionRating = 'EASY' | 'GOOD' | 'AGAIN'
+
+export interface SessionSummary {
+  id: string
+  startedAt: string       // ISO-8601
+  completedAt: string     // ISO-8601
+  totalUniqueWords: number
+  easyCount: number
+  goodCount: number
+  againCount: number
+}
+
+export interface SessionWordResult {
+  wordId: string
+  word: string
+  rating: SessionRating
+}
+
+export interface SessionDetail extends SessionSummary {
+  wordResults: SessionWordResult[]
+}
+
+export interface SessionHistoryPage {
+  content: SessionSummary[]
+  totalElements: number
+  totalPages: number
+  number: number   // current page (0-indexed)
+  size: number
+}
+
 // Error type
 export interface ApiError {
   status: number
@@ -121,4 +152,23 @@ export interface ReviewResponse {
   interval: number
   easeFactor: number
   repetitions: number
+}
+
+// Streak & Gamification types
+export interface StreakResponse {
+  currentStreak: number
+  longestStreak: number
+  activeDaysLast30: number
+  badges: string[]  // e.g. ["STREAK_3", "STREAK_7"]
+}
+
+// Smart Import types
+export interface SmartImportSuggestion {
+  word: string
+  phonetic?: string
+  type?: string
+  meaning: string       // always "" from backend — user fills in before import
+  definition?: string   // English definition from Free Dictionary API
+  example?: string
+  alreadyExists: boolean
 }

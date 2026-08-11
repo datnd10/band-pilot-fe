@@ -19,6 +19,11 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [flipped, setFlipped] = useState(false)
   const [done, setDone] = useState(false)
+  // Listening Mode: auto-pronounce the word when the card is flipped
+  const [autoSpeak, setAutoSpeak] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('bp_auto_speak') === 'true'
+  })
 
   // Rating counts
   const [againCount, setAgainCount] = useState(0)
@@ -33,7 +38,21 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
 
   function flipCard() {
     // Front → back only; ignore if already flipped
-    if (!flipped) setFlipped(true)
+    if (!flipped) {
+      setFlipped(true)
+      // Listening Mode: auto-pronounce on flip if enabled
+      if (autoSpeak && currentWord) {
+        speak(currentWord.word)
+      }
+    }
+  }
+
+  function toggleAutoSpeak() {
+    setAutoSpeak(prev => {
+      const next = !prev
+      localStorage.setItem('bp_auto_speak', String(next))
+      return next
+    })
   }
 
   async function handleRate(rating: SrsRating) {
@@ -72,12 +91,14 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
     flipCard,
     speakCurrent: () => currentWord && speak(currentWord.word),
     flipped,
+    toggleAutoSpeak,
   })
   useEffect(() => {
     handlersRef.current = {
       flipCard,
       speakCurrent: () => currentWord && speak(currentWord.word),
       flipped,
+      toggleAutoSpeak,
     }
   })
 
@@ -95,6 +116,9 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
         if (handlersRef.current.flipped) {
           handlersRef.current.speakCurrent()
         }
+      } else if (e.key === 'l' || e.key === 'L') {
+        e.preventDefault()
+        handlersRef.current.toggleAutoSpeak()
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -180,6 +204,26 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
         <span className="text-sm font-medium text-gray-500">
           Card {currentIndex + 1} of {total}
         </span>
+        {/* Listening Mode toggle */}
+        <button
+          type="button"
+          onClick={toggleAutoSpeak}
+          aria-pressed={autoSpeak}
+          aria-label={autoSpeak ? 'Listening mode on — click to turn off' : 'Listening mode off — click to turn on'}
+          title={autoSpeak ? 'Auto-pronounce: ON' : 'Auto-pronounce: OFF'}
+          className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
+            autoSpeak
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'border border-gray-300 bg-white text-gray-500 hover:bg-gray-50'
+          }`}
+        >
+          {/* Speaker icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11 5L6 9H2v6h4l5 4V5z" />
+            {autoSpeak && <path strokeLinecap="round" strokeLinejoin="round" d="M15.54 8.46a5 5 0 010 7.07" />}
+          </svg>
+          {autoSpeak ? 'Auto ON' : 'Auto OFF'}
+        </button>
       </div>
 
       {/* Progress bar */}
@@ -204,7 +248,9 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
         <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">Space</kbd>
         {' '}reveal &ensp;
         <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">P</kbd>
-        {' '}pronounce (after reveal)
+        {' '}pronounce (after reveal) &ensp;
+        <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">L</kbd>
+        {' '}{autoSpeak ? 'listening mode on' : 'listening mode off'}
       </p>
     </div>
   )

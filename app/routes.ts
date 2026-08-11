@@ -23,9 +23,15 @@ export default [
   // Bulk import
   route("/import", "routes/import.tsx"),
 
+  // Smart Import
+  route("/smart-import", "routes/smart-import.tsx"),
+
   // Dashboard
   route("/dashboard", "routes/dashboard.tsx"),
 
   // Daily Review (SRS)
   route("/review", "routes/review.tsx"),
+
+  // Session History
+  route("/session-history", "routes/session-history.tsx"),
 ] satisfies RouteConfig;

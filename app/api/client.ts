@@ -8,6 +8,10 @@ import type {
   ReviewRequest,
   ReviewResponse,
   ReviewSessionRequest,
+  SessionDetail,
+  SessionHistoryPage,
+  SmartImportSuggestion,
+  StreakResponse,
   TypingSessionRequest,
   WordRequest,
   WordResponse,
@@ -295,6 +299,17 @@ export function importCsv(file: File, groupId?: string): Promise<ImportResponse>
 }
 
 // ---------------------------------------------------------------------------
+// Smart Import
+// ---------------------------------------------------------------------------
+
+export function analyzeTextForImport(text: string): Promise<SmartImportSuggestion[]> {
+  return apiFetch<SmartImportSuggestion[]>('/import/analyze', {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  })
+}
+
+// ---------------------------------------------------------------------------
 // SRS (Spaced Repetition System)
 // ---------------------------------------------------------------------------
 
@@ -315,4 +330,20 @@ export function getSrsDueCount(): Promise<{ count: number }> {
 
 export function getSrsProgress(): Promise<ProgressResponse> {
   return apiFetch<ProgressResponse>('/srs/progress')
+}
+
+// ---------------------------------------------------------------------------
+// Session History
+// ---------------------------------------------------------------------------
+
+export function getSessionHistory(page = 0, size = 20): Promise<SessionHistoryPage> {
+  return apiFetch<SessionHistoryPage>(`/sessions/history?page=${page}&size=${size}`)
+}
+
+export function getSessionDetail(id: string): Promise<SessionDetail> {
+  return apiFetch<SessionDetail>(`/sessions/history/${id}`)
+}
+
+export function getStreak(): Promise<StreakResponse> {
+  return apiFetch<StreakResponse>('/sessions/streak')
 }
