@@ -34,4 +34,19 @@ export default [
 
   // Session History
   route("/session-history", "routes/session-history.tsx"),
+
+  // Grammar Reference
+  route("/grammar", "routes/grammar.tsx"),
+
+  // Grammar Practice (AI)
+  route("/grammar/practice", "routes/grammar-practice.tsx"),
+
+  // Writing Guide
+  route("/writing-guide", "routes/writing-guide.tsx"),
+
+  // Essay Practice (AI)
+  route("/grammar/essay", "routes/grammar-essay.tsx"),
+
+  // Essay History
+  route("/grammar/essay/history", "routes/grammar-essay-history.tsx"),
 ] satisfies RouteConfig;

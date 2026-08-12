@@ -142,21 +142,21 @@ export function ReviewCard({ word, flipped, onFlipRequest, onRate, examples }: R
               onClick={() => onRate('AGAIN')}
               className="flex-1 rounded-xl border border-red-200 bg-red-50 py-2.5 text-sm font-semibold text-red-700 shadow-sm transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-1"
             >
-              Again
+              Again <kbd className="ml-1 rounded border border-red-200 bg-red-100 px-1 py-0.5 font-mono text-xs text-red-500">A</kbd>
             </button>
             <button
               type="button"
               onClick={() => onRate('GOOD')}
               className="flex-1 rounded-xl border border-blue-200 bg-blue-50 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1"
             >
-              Good
+              Good <kbd className="ml-1 rounded border border-blue-200 bg-blue-100 px-1 py-0.5 font-mono text-xs text-blue-500">G</kbd>
             </button>
             <button
               type="button"
               onClick={() => onRate('EASY')}
               className="flex-1 rounded-xl border border-green-200 bg-green-50 py-2.5 text-sm font-semibold text-green-700 shadow-sm transition-colors hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-1"
             >
-              Easy
+              Easy <kbd className="ml-1 rounded border border-green-200 bg-green-100 px-1 py-0.5 font-mono text-xs text-green-500">E</kbd>
             </button>
           </div>
         </div>

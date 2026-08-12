@@ -92,6 +92,7 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
     speakCurrent: () => currentWord && speak(currentWord.word),
     flipped,
     toggleAutoSpeak,
+    onRate: handleRate,
   })
   useEffect(() => {
     handlersRef.current = {
@@ -99,6 +100,7 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
       speakCurrent: () => currentWord && speak(currentWord.word),
       flipped,
       toggleAutoSpeak,
+      onRate: handleRate,
     }
   })
 
@@ -119,6 +121,18 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
       } else if (e.key === 'l' || e.key === 'L') {
         e.preventDefault()
         handlersRef.current.toggleAutoSpeak()
+      } else if (handlersRef.current.flipped) {
+        // Rating shortcuts — only when back face visible
+        if (e.key === 'a' || e.key === 'A') {
+          e.preventDefault()
+          handlersRef.current.onRate('AGAIN')
+        } else if (e.key === 'g' || e.key === 'G') {
+          e.preventDefault()
+          handlersRef.current.onRate('GOOD')
+        } else if (e.key === 'e' || e.key === 'E') {
+          e.preventDefault()
+          handlersRef.current.onRate('EASY')
+        }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -248,9 +262,15 @@ function ReviewSession({ words }: { words: DueWordResponse[] }) {
         <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">Space</kbd>
         {' '}reveal &ensp;
         <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">P</kbd>
-        {' '}pronounce (after reveal) &ensp;
+        {' '}pronounce &ensp;
+        <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">A</kbd>
+        {' '}again &ensp;
+        <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">G</kbd>
+        {' '}good &ensp;
+        <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">E</kbd>
+        {' '}easy &ensp;
         <kbd className="rounded border border-gray-200 bg-gray-100 px-1.5 py-0.5 font-mono text-gray-500">L</kbd>
-        {' '}{autoSpeak ? 'listening mode on' : 'listening mode off'}
+        {' '}{autoSpeak ? 'listening on' : 'listening off'}
       </p>
     </div>
   )

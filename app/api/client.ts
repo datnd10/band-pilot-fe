@@ -1,6 +1,9 @@
 import type {
   ApiError,
   DueWordResponse,
+  EssayHistoryDetail,
+  EssayHistoryItem,
+  EssayScoreResponse,
   GroupRequest,
   GroupResponse,
   ImportResponse,
@@ -8,10 +11,12 @@ import type {
   ReviewRequest,
   ReviewResponse,
   ReviewSessionRequest,
+  RoundResult,
   SessionDetail,
   SessionHistoryPage,
   SmartImportSuggestion,
   StreakResponse,
+  StructuredFeedback,
   TypingSessionRequest,
   WordRequest,
   WordResponse,
@@ -346,4 +351,52 @@ export function getSessionDetail(id: string): Promise<SessionDetail> {
 
 export function getStreak(): Promise<StreakResponse> {
   return apiFetch<StreakResponse>('/sessions/streak')
+}
+
+// ---------------------------------------------------------------------------
+// Grammar Practice (AI)
+// ---------------------------------------------------------------------------
+
+export function generateGrammarPrompt(
+  structureId: string,
+  structureTitle: string,
+): Promise<{ prompt: string }> {
+  return apiFetch<{ prompt: string }>('/grammar/prompt', {
+    method: 'POST',
+    body: JSON.stringify({ structureId, structureTitle }),
+  })
+}
+
+export function evaluateGrammarResponse(
+  structureId: string,
+  structureTitle: string,
+  prompt: string,
+  userResponse: string,
+): Promise<StructuredFeedback> {
+  return apiFetch<StructuredFeedback>('/grammar/evaluate', {
+    method: 'POST',
+    body: JSON.stringify({ structureId, structureTitle, prompt, userResponse }),
+  })
+}
+
+export function scoreEssay(question: string, essay: string): Promise<EssayScoreResponse> {
+  return apiFetch<EssayScoreResponse>('/grammar/essay/score', {
+    method: 'POST',
+    body: JSON.stringify({ question, essay }),
+  })
+}
+
+export function generateEssayQuestion(topic: string): Promise<{ prompt: string }> {
+  return apiFetch<{ prompt: string }>('/grammar/essay/generate-question', {
+    method: 'POST',
+    body: JSON.stringify({ topic }),
+  })
+}
+
+export function getEssayHistory(): Promise<EssayHistoryItem[]> {
+  return apiFetch<EssayHistoryItem[]>('/grammar/essay/history')
+}
+
+export function getEssayDetail(id: string): Promise<EssayHistoryDetail> {
+  return apiFetch<EssayHistoryDetail>(`/grammar/essay/history/${id}`)
 }

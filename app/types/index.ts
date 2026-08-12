@@ -162,6 +162,39 @@ export interface StreakResponse {
   badges: string[]  // e.g. ["STREAK_3", "STREAK_7"]
 }
 
+// Grammar Practice types
+export interface StructuredFeedback {
+  structure_used: boolean
+  errors: string[]
+  suggestions: string[]
+  model_sentence: string
+  score: number  // 1-5
+  encouragement: string
+}
+
+export interface EssayScoreResponse {
+  taskAchievement: number
+  coherenceCohesion: number
+  lexicalResource: number
+  grammaticalRange: number
+  overallBand: number
+  strengths: string[]
+  improvements: Array<{
+    original: string
+    issue: string
+    correction: string
+    explanation: string
+  }>
+  improvedVersion: string
+  encouragement: string
+}
+
+export interface RoundResult {
+  structureId: string
+  structureTitle: string
+  score: number
+}
+
 // Smart Import types
 export interface SmartImportSuggestion {
   word: string
@@ -171,4 +204,24 @@ export interface SmartImportSuggestion {
   definition?: string   // English definition from Free Dictionary API
   example?: string
   alreadyExists: boolean
+}
+
+// Essay History types
+export interface EssayHistoryItem {
+  id: string
+  question: string      // truncated to 120 chars
+  overallBand: number
+  taskAchievement: number
+  coherenceCohesion: number
+  lexicalResource: number
+  grammaticalRange: number
+  submittedAt: string
+}
+
+export interface EssayHistoryDetail extends EssayHistoryItem {
+  essay: string
+  strengths: string[]
+  improvements: string[]
+  improvedVersion: string
+  encouragement: string
 }

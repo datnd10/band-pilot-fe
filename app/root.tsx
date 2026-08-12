@@ -35,15 +35,24 @@ export const links: Route.LinksFunction = () => [
 ]
 
 // ---------------------------------------------------------------------------
-// Nav items
+// Nav structure — 2 main modules with dropdowns
 // ---------------------------------------------------------------------------
 
-const NAV_ITEMS = [
+const VOCAB_ITEMS = [
   { label: 'Dictionary', to: '/vocabulary' },
   { label: 'Study Sets', to: '/groups' },
+  { label: 'Daily Review', to: '/review' },
   { label: 'Dashboard', to: '/dashboard' },
   { label: 'History', to: '/session-history' },
   { label: 'Smart Import', to: '/smart-import' },
+] as const
+
+const GRAMMAR_ITEMS = [
+  { label: 'Grammar Reference', to: '/grammar' },
+  { label: 'Grammar Practice', to: '/grammar/practice' },
+  { label: 'Writing Guide', to: '/writing-guide' },
+  { label: 'Essay Practice', to: '/grammar/essay' },
+  { label: 'Essay History', to: '/grammar/essay/history' },
 ] as const
 
 // ---------------------------------------------------------------------------
@@ -82,6 +91,74 @@ function ToastList() {
 }
 
 // ---------------------------------------------------------------------------
+// DropdownMenu — module dropdown for desktop nav
+// ---------------------------------------------------------------------------
+
+function DropdownMenu({
+  label,
+  items,
+  isActive,
+}: {
+  label: string
+  items: readonly { label: string; to: string; disabled?: boolean }[]
+  isActive: boolean
+}) {
+  const [open, setOpen] = useState(false)
+
+  return (
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button
+        type="button"
+        className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1 ${
+          isActive
+            ? 'bg-blue-600 text-white'
+            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+        }`}
+        aria-expanded={open}
+        aria-haspopup="true"
+      >
+        {label}
+        <svg
+          className={`h-3.5 w-3.5 transition-transform ${open ? 'rotate-180' : ''}`}
+          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-50 mt-1 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          {items.map((item) =>
+            item.disabled ? (
+              <span
+                key={item.label}
+                className="block px-4 py-2 text-sm text-gray-400 cursor-not-allowed italic"
+              >
+                {item.label}
+              </span>
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `block px-4 py-2 text-sm transition-colors hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus:bg-blue-50 ${
+                    isActive ? 'bg-blue-50 text-blue-700 font-medium' : 'text-gray-700'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Top navigation bar
 // ---------------------------------------------------------------------------
 
@@ -91,6 +168,12 @@ function TopNav() {
   const [currentStreak, setCurrentStreak] = useState(0)
   const navigate = useNavigate()
   const location = useLocation()
+
+  // Determine active module
+  const vocabPaths = ['/vocabulary', '/groups', '/dashboard', '/session-history', '/smart-import', '/review']
+  const grammarPaths = ['/grammar', '/grammar/practice', '/grammar/essay']
+  const isVocabActive = vocabPaths.some(p => location.pathname === p || location.pathname.startsWith(p + '/'))
+  const isGrammarActive = grammarPaths.some(p => location.pathname === p || location.pathname.startsWith(p + '/'))
 
   useEffect(() => {
     getSrsDueCount()
@@ -108,14 +191,6 @@ function TopNav() {
     clearToken()
     navigate('/login', { replace: true })
   }
-
-  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
-    [
-      'px-3 py-2 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1',
-      isActive
-        ? 'bg-blue-600 text-white'
-        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900',
-    ].join(' ')
 
   const mobileNavLinkClass = ({ isActive }: { isActive: boolean }) =>
     [
@@ -141,31 +216,26 @@ function TopNav() {
             Band Pilot
           </NavLink>
 
-          {/* Desktop nav links */}
+          {/* Desktop nav — module dropdowns */}
           <div className="hidden items-center gap-1 md:flex" role="menubar">
-            {NAV_ITEMS.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={navLinkClass}
-                role="menuitem"
-              >
-                {item.label}
-              </NavLink>
-            ))}
-            <NavLink
-              to="/review"
-              className={navLinkClass}
-              role="menuitem"
-            >
-              Review ({dueCount})
-            </NavLink>
+            {/* Vocabulary module — label shows due count */}
+            <DropdownMenu
+              label={dueCount > 0 ? `Vocabulary (${dueCount})` : 'Vocabulary'}
+              items={VOCAB_ITEMS}
+              isActive={isVocabActive}
+            />
+
+            {/* Grammar module */}
+            <DropdownMenu label="Grammar" items={GRAMMAR_ITEMS} isActive={isGrammarActive} />
+
+            {/* Streak indicator */}
             <span
               className="px-3 py-2 text-sm font-medium text-orange-600"
               aria-label={`Streak: ${currentStreak} ngày`}
             >
               🔥 {currentStreak}
             </span>
+
             <button
               type="button"
               onClick={handleLogout}
@@ -175,7 +245,7 @@ function TopNav() {
             </button>
           </div>
 
-          {/* Mobile hamburger button */}
+          {/* Mobile hamburger */}
           <button
             type="button"
             className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 md:hidden"
@@ -185,29 +255,11 @@ function TopNav() {
             onClick={() => setMenuOpen((prev) => !prev)}
           >
             {menuOpen ? (
-              /* X icon */
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              /* Hamburger icon */
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-                aria-hidden="true"
-              >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
@@ -219,7 +271,9 @@ function TopNav() {
       {menuOpen && (
         <div id="mobile-menu" className="border-t border-gray-100 bg-white px-4 py-3 md:hidden">
           <div className="space-y-1" role="menu" aria-label="Mobile navigation">
-            {NAV_ITEMS.map((item) => (
+            {/* Vocabulary section */}
+            <p className="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Vocabulary</p>
+            {VOCAB_ITEMS.map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -230,20 +284,30 @@ function TopNav() {
                 {item.label}
               </NavLink>
             ))}
-            <NavLink
-              to="/review"
-              className={mobileNavLinkClass}
-              role="menuitem"
-              onClick={() => setMenuOpen(false)}
-            >
-              Review ({dueCount})
-            </NavLink>
-            <span
-              className="block rounded-md px-3 py-2 text-base font-medium text-orange-600"
-              aria-label={`Streak: ${currentStreak} ngày`}
-            >
-              🔥 {currentStreak}
-            </span>
+
+            {/* Grammar section */}
+            <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Grammar</p>
+            {GRAMMAR_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={mobileNavLinkClass}
+                role="menuitem"
+                onClick={() => setMenuOpen(false)}
+              >
+                {item.label}
+              </NavLink>
+            ))}
+
+            {/* Review + streak */}
+            <div className="border-t border-gray-100 pt-2 mt-2">
+              <span
+                className="block rounded-md px-3 py-2 text-base font-medium text-orange-600"
+                aria-label={`Streak: ${currentStreak} ngày`}
+              >
+                🔥 {currentStreak}
+              </span>
+            </div>
           </div>
         </div>
       )}
