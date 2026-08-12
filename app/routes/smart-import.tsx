@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router'
 import type { GroupResponse, SmartImportSuggestion, ApiError, WordType } from '~/types'
-import { analyzeTextForImport, createWord, getGroups } from '~/api/client'
+import { analyzeTextForImport, createWord, createWordInGroup, addWordToGroup, getGroups } from '~/api/client'
 
 // ---------------------------------------------------------------------------
 // Meta
@@ -639,13 +639,25 @@ export default function SmartImportPage() {
 
     for (const suggestion of wordsToImport) {
       try {
-        await createWord({
-          word: suggestion.word,
-          phonetic: suggestion.phonetic,
-          type: suggestion.type as WordType | undefined,
-          meaning: meanings[suggestion.word] || suggestion.definition || 'See definition',
-          examples: suggestion.example ? [suggestion.example] : [],
-        })
+        if (selectedGroupId) {
+          // Create word directly in the group (single API call)
+          await createWordInGroup(selectedGroupId, {
+            word: suggestion.word,
+            phonetic: suggestion.phonetic,
+            type: suggestion.type as WordType | undefined,
+            meaning: meanings[suggestion.word] || suggestion.definition || 'See definition',
+            examples: suggestion.example ? [suggestion.example] : [],
+          })
+        } else {
+          // No group selected — add to global vocabulary
+          await createWord({
+            word: suggestion.word,
+            phonetic: suggestion.phonetic,
+            type: suggestion.type as WordType | undefined,
+            meaning: meanings[suggestion.word] || suggestion.definition || 'See definition',
+            examples: suggestion.example ? [suggestion.example] : [],
+          })
+        }
         done++
       } catch {
         failed++
